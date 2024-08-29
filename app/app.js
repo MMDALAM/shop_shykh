@@ -8,6 +8,7 @@ const { URL_MONGODB } = process.env;
 const createError = require("http-errors");
 const { AllRouters } = require("./router/router");
 const cors = require("cors");
+const { deleteFilePublic } = require("./utils/functions");
 
 module.exports = class Application {
   constructor() {
@@ -54,10 +55,8 @@ module.exports = class Application {
       const serverError = createError.BadRequest();
       const status = error.status || serverError.status;
       const message = error.message || serverError.message;
-      if (req.file) {
-        req.body.image = path.join(req.body.fileUploadPath, req.body.filename);
-        let image = req.body.image.replace(/\\/gi, "/");
-        deleteFileInPublic(image);
+      if (req.files) {
+        deleteFilePublic(req.files);
       }
       return res.status(status).json({
         status: status,

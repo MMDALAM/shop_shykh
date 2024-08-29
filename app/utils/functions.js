@@ -31,18 +31,19 @@ async function uniqueSlug() {
   return string;
 }
 
-async function deleteFilePublic(fileAddress) {
-  if (fileAddress) {
-    const pathFile = path.join(__dirname, "..", "..", "public", fileAddress);
-    if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
+async function deleteFilePublic(files) {
+  const file = files?.map((file) => file.path);
+  if (file) {
+    file.forEach((image) => {
+      if (fs.existsSync(image)) fs.unlinkSync(image);
+    });
   }
 }
 
-async function deleteLastFilePublic(fileAddress) {
-  if (fileAddress) {
-    fileAddress.forEach((Address) => {
-      const pathFile = path.join(__dirname, "..", "..", "public", Address);
-      if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
+async function deleteLastFilePublic(images) {
+  if (images) {
+    images.forEach((image) => {
+      if (fs.existsSync(image)) fs.unlinkSync(image);
     });
   }
 }

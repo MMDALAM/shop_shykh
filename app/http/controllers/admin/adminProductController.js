@@ -4,13 +4,16 @@ const {
   deleteFilePublic,
   deleteLastFilePublic,
 } = require("../../../utils/functions");
+const {
+  productSchema,
+  editProductSchema,
+} = require("../../validators/product");
 const controller = require("../controller");
-const path = require("path");
-const fs = require("fs");
 
 class adminProductController extends controller {
   async createProduct(req, res, next) {
     try {
+      await productSchema.validateAsync(req.body);
       let { title, description } = req.body;
       let priceVariants = this.priceVariants(req.body.priceVariants);
       const slug = await uniqueSlug();
@@ -38,13 +41,13 @@ class adminProductController extends controller {
         message: `لباس مورد نظر ' ${title} ' با موفقیت ذخیره شد`,
       });
     } catch (err) {
-      deleteFilePublic(req.body.images);
       next(err);
     }
   }
 
   async editProduct(req, res, next) {
     try {
+      await editProductSchema.validateAsync(req.body);
       const { id } = req.params;
       let { title, description } = req.body;
       let priceVariants = this.priceVariants(req.body.priceVariants);
@@ -79,6 +82,7 @@ class adminProductController extends controller {
         message: `لباس مورد نظر ' ${title} '  با موفقیت بروزرسانی شد`,
       });
     } catch (err) {
+      deleteFilePublic(req.body.images);
       next(err);
     }
   }
@@ -88,14 +92,7 @@ class adminProductController extends controller {
       const { id } = req.params;
       let product = await productModel.findById(id);
 
-      // deleteLastFilePublic(product.images);
-
-      product.images.forEach((Address) => {
-        console.log(Address);
-        const pathFile = path.join(__dirname, "..", "..", "public", Address);
-        console.log(fs.existsSync(pathFile));
-        if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
-      });
+      deleteLastFilePublic(product.images);
 
       const deleteProduct = await productModel.findByIdAndDelete(id);
       if (!deleteProduct)
