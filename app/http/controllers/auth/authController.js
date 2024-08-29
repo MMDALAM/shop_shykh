@@ -1,11 +1,13 @@
 const { userModel } = require("../../../models/user");
 const { createCode, jwtSign } = require("../../../utils/functions");
+const { authSchema, loginSchema } = require("../../validators/auth");
 const controller = require("../controller");
 const createError = require("http-errors");
 
 class auth extends controller {
   async auth(req, res, next) {
     try {
+      await authSchema.validateAsync(req.body);
       const { phone } = req.body;
       const code = createCode();
       const user = await this.checkExistUser(phone);
@@ -38,6 +40,7 @@ class auth extends controller {
 
   async login(req, res, next) {
     try {
+      await loginSchema.validateAsync(req.body);
       const { phone, code } = req.body;
       const user = await userModel.findOne({ phone });
       if (!user) createError.Unauthorized("کاربر مورد نظر پیدا نشد");

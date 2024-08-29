@@ -51,7 +51,7 @@ module.exports = class Application {
       next(createError.NotFound("آدرس مورد نظر پیدا نشد"));
     });
     app.use((error, req, res, next) => {
-      const serverError = createError.InternalServerError();
+      const serverError = createError.BadRequest();
       const status = error.status || serverError.status;
       const message = error.message || serverError.message;
 

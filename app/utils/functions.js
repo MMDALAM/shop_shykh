@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+const JWT = require("jsonwebtoken");
 const createError = require("http-errors");
 
 function createCode() {
@@ -13,7 +13,7 @@ function jwtSign(userID) {
     const options = {
       expiresIn: "6d",
     };
-    jwt.sign(payload, "secretOrPrivateKey", options, (err, token) => {
+    JWT.sign(payload, "secret_key", options, (err, token) => {
       if (err) reject(createError.Unauthorized("خطا در شناسایی توکن"));
       resolve(token);
     });
