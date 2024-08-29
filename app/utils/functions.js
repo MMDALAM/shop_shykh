@@ -2,6 +2,8 @@ const JWT = require("jsonwebtoken");
 const createError = require("http-errors");
 const { productModel } = require("../models/product");
 const randomString = require("randomstring");
+const fs = require("fs");
+const path = require("path");
 
 function createCode() {
   return Math.floor(Math.random() * 90000 + 10000);
@@ -29,4 +31,26 @@ async function uniqueSlug() {
   return string;
 }
 
-module.exports = { createCode, jwtSign, uniqueSlug };
+async function deleteFilePublic(fileAddress) {
+  if (fileAddress) {
+    const pathFile = path.join(__dirname, "..", "..", "public", fileAddress);
+    if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
+  }
+}
+
+async function deleteLastFilePublic(fileAddress) {
+  if (fileAddress) {
+    fileAddress.forEach((Address) => {
+      const pathFile = path.join(__dirname, "..", "..", "public", Address);
+      if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
+    });
+  }
+}
+
+module.exports = {
+  createCode,
+  jwtSign,
+  uniqueSlug,
+  deleteFilePublic,
+  deleteLastFilePublic,
+};

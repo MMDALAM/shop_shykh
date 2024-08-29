@@ -1,6 +1,12 @@
 const { productModel } = require("../../../models/product");
-const { uniqueSlug } = require("../../../utils/functions");
+const {
+  uniqueSlug,
+  deleteFilePublic,
+  deleteLastFilePublic,
+} = require("../../../utils/functions");
 const controller = require("../controller");
+const path = require("path");
+const fs = require("fs");
 
 class adminProductController extends controller {
   async createProduct(req, res, next) {
@@ -9,12 +15,20 @@ class adminProductController extends controller {
       let priceVariants = this.priceVariants(req.body.priceVariants);
       const slug = await uniqueSlug();
 
+      const images = req.files.map((file) => file.path);
+      const imagesUrl = req.files.map(
+        (file) =>
+          `${req.protocol}://${req.get("host")}/uploads/${file.filename}`
+      );
+
       const newProduct = new productModel({
         title,
         slug,
         description,
         priceVariants,
         owner: req.user.id,
+        images,
+        imagesUrl,
       });
       await newProduct.save();
       const user = req.user;
@@ -24,6 +38,7 @@ class adminProductController extends controller {
         message: `لباس مورد نظر ' ${title} ' با موفقیت ذخیره شد`,
       });
     } catch (err) {
+      deleteFilePublic(req.body.images);
       next(err);
     }
   }
@@ -34,6 +49,16 @@ class adminProductController extends controller {
       let { title, description } = req.body;
       let priceVariants = this.priceVariants(req.body.priceVariants);
       let product = await productModel.findById(id);
+      let { images, imagesUrl } = product;
+
+      if (req.files) {
+        deleteLastFilePublic(product.images);
+        images = req.files.map((file) => file.path);
+        imagesUrl = req.files.map(
+          (file) =>
+            `${req.protocol}://${req.get("host")}/uploads/${file.filename}`
+        );
+      }
 
       let objUpdate = {};
       objUpdate.title = title;
@@ -41,6 +66,8 @@ class adminProductController extends controller {
       objUpdate.priceVariants = priceVariants.length
         ? priceVariants
         : product.priceVariants;
+      objUpdate.images = images;
+      objUpdate.imagesUrl = imagesUrl;
 
       const updateProduct = await productModel.findByIdAndUpdate(id, objUpdate);
       if (!!updateProduct.modifiedCount)
@@ -59,6 +86,16 @@ class adminProductController extends controller {
   async deleteProduct(req, res, next) {
     try {
       const { id } = req.params;
+      let product = await productModel.findById(id);
+
+      // deleteLastFilePublic(product.images);
+
+      product.images.forEach((Address) => {
+        console.log(Address);
+        const pathFile = path.join(__dirname, "..", "..", "public", Address);
+        console.log(fs.existsSync(pathFile));
+        if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
+      });
 
       const deleteProduct = await productModel.findByIdAndDelete(id);
       if (!deleteProduct)

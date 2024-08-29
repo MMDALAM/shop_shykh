@@ -54,7 +54,11 @@ module.exports = class Application {
       const serverError = createError.BadRequest();
       const status = error.status || serverError.status;
       const message = error.message || serverError.message;
-
+      if (req.file) {
+        req.body.image = path.join(req.body.fileUploadPath, req.body.filename);
+        let image = req.body.image.replace(/\\/gi, "/");
+        deleteFileInPublic(image);
+      }
       return res.status(status).json({
         status: status,
         message: message,

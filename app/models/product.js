@@ -16,6 +16,7 @@ const productSchema = new schema(
     priceVariants: [priceVariants],
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     images: [{ type: String }],
+    imagesUrl: [{ type: String }],
   },
   { timestamps: true }
 );
