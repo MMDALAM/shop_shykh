@@ -13,12 +13,12 @@ function directory(req) {
     "..",
     "..",
     "public",
-    "upload",
+    "uploads",
     year,
     month,
     day
   );
-  req.body.fileUploadPath = path.join("upload", year, month, day);
+  req.body.fileUploadPath = path.join("uploads", year, month, day);
   fs.mkdirSync(directory, { recursive: true });
   return directory;
 }
@@ -32,7 +32,6 @@ const storage = multer.diskStorage({
     cb(null, null);
   },
   filename: (req, file, cb) => {
-    
     if (file.originalname) {
       const extName = path.extname(file.originalname);
       const fileName = String(new Date().getTime() + extName);

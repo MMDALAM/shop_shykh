@@ -4,7 +4,7 @@ const http = require("http");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const { PORT } = process.env;
-const { URL_MONGODB } = process.env;
+const { LOCAL_MONGODB } = process.env;
 const createError = require("http-errors");
 const { AllRouters } = require("./router/router");
 const cors = require("cors");
@@ -34,7 +34,7 @@ module.exports = class Application {
     mongoose.Promise = global.Promise;
     mongoose.set("strictPopulate", true);
     mongoose.set("strictQuery", true);
-    mongoose.connect(URL_MONGODB);
+    mongoose.connect(LOCAL_MONGODB);
     mongoose.connection.on("connected", () => {
       console.log("mongoose connected to DB");
     });

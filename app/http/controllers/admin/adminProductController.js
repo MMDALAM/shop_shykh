@@ -64,8 +64,8 @@ class adminProductController extends controller {
       }
 
       let objUpdate = {};
-      objUpdate.title = title;
-      objUpdate.description = description;
+      objUpdate.title = title || product.title;
+      objUpdate.description = description || product.description;
       objUpdate.priceVariants = priceVariants.length
         ? priceVariants
         : product.priceVariants;
