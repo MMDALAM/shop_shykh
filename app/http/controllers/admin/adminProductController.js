@@ -118,7 +118,7 @@ class adminProductController extends controller {
         {},
         {
           options,
-          populate: [{ path: "owner", select: "firstName" }],
+          populate: [{ path: "owner", select: ["firstName", "roles"] }],
         }
       );
       return res.status(200).json({
@@ -134,7 +134,7 @@ class adminProductController extends controller {
       const { id } = req.params;
       const product = await productModel
         .findById(id)
-        .populate("owner", "firstName");
+        .populate("owner", ["firstName", "roles"]);
       return res.status(200).json({
         product,
       });

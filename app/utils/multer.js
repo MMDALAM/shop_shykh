@@ -32,6 +32,7 @@ const storage = multer.diskStorage({
     cb(null, null);
   },
   filename: (req, file, cb) => {
+    
     if (file.originalname) {
       const extName = path.extname(file.originalname);
       const fileName = String(new Date().getTime() + extName);

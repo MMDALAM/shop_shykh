@@ -48,7 +48,7 @@ class auth extends controller {
       const token = await jwtSign(user._id);
       return res.status(201).json({
         token: token,
-        message: "لطفا توکن در header های  postman قرار دهید",
+        message: "لطفا توکن در هدرز قرار دهید",
       });
     } catch (err) {
       next(err);
