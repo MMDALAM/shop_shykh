@@ -3,7 +3,7 @@ const createError = require("http-errors");
 const { productModel } = require("../models/product");
 const randomString = require("randomstring");
 const fs = require("fs");
-const path = require("path");
+const { default: mongoose } = require("mongoose");
 
 function createCode() {
   return Math.floor(Math.random() * 90000 + 10000);
@@ -48,10 +48,17 @@ async function deleteLastFilePublic(images) {
   }
 }
 
+function mongoDBIdValidation(id) {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw createError.BadRequest("ایدی ارسال شده صحیح نیمباشد");
+  return true;
+}
+
 module.exports = {
   createCode,
   jwtSign,
   uniqueSlug,
   deleteFilePublic,
   deleteLastFilePublic,
+  mongoDBIdValidation,
 };

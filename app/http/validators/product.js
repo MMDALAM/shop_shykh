@@ -18,6 +18,7 @@ const productSchema = Joi.object({
     .regex(/(\.png|\.jpg|\.webp|\.jpeg|\.gif)$/)
     .message(" شماره موبایل را با 0 و صحیح وارد کنید "),
   fileUploadPath: Joi.allow(),
+  images: Joi.allow(),
 });
 
 const editProductSchema = Joi.object({
@@ -38,6 +39,7 @@ const editProductSchema = Joi.object({
     .regex(/(\.png|\.jpg|\.webp|\.jpeg|\.gif)$/)
     .message(" شماره موبایل را با 0 و صحیح وارد کنید "),
   fileUploadPath: Joi.allow(),
+  images: Joi.allow(),
 });
 
 module.exports = { productSchema, editProductSchema };

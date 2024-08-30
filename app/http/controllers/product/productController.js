@@ -1,6 +1,7 @@
 const { populate } = require("dotenv");
 const { productModel } = require("../../../models/product");
 const controller = require("../controller");
+const createError = require("http-errors");
 
 class product extends controller {
   async allProduct(req, res, next) {
@@ -25,6 +26,7 @@ class product extends controller {
         { slug },
         { _id: 0, owner: 0, images: 0, __v: 0, updatedAt: 0 }
       );
+      if (!product) throw createError.BadRequest("لباس مورد نظر پیدا نشد");
 
       return res.status(200).json({
         product,

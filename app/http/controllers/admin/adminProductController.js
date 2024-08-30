@@ -1,14 +1,15 @@
 const { productModel } = require("../../../models/product");
 const {
   uniqueSlug,
-  deleteFilePublic,
   deleteLastFilePublic,
+  mongoDBIdValidation,
 } = require("../../../utils/functions");
 const {
   productSchema,
   editProductSchema,
 } = require("../../validators/product");
 const controller = require("../controller");
+const createError = require("http-errors");
 
 class adminProductController extends controller {
   async createProduct(req, res, next) {
@@ -49,9 +50,12 @@ class adminProductController extends controller {
     try {
       await editProductSchema.validateAsync(req.body);
       const { id } = req.params;
+      mongoDBIdValidation(id);
       let { title, description } = req.body;
       let priceVariants = this.priceVariants(req.body.priceVariants);
       let product = await productModel.findById(id);
+      if (!product) throw createError.BadRequest("لباس مورد نظر پیدا نشد");
+
       let { images, imagesUrl } = product;
 
       if (req.files) {
@@ -74,15 +78,14 @@ class adminProductController extends controller {
 
       const updateProduct = await productModel.findByIdAndUpdate(id, objUpdate);
       if (!!updateProduct.modifiedCount)
-        return res.status(200).json({
-          message: `لباس مورد نظر ' ${title} ' بروزرسانی نشده`,
-        });
+        throw createError.Forbidden(
+          `لباس مورد نظر ' ${title} ' بروزرسانی نشده`
+        );
 
       return res.status(200).json({
         message: `لباس مورد نظر ' ${title} '  با موفقیت بروزرسانی شد`,
       });
     } catch (err) {
-      deleteFilePublic(req.body.images);
       next(err);
     }
   }
@@ -90,15 +93,14 @@ class adminProductController extends controller {
   async deleteProduct(req, res, next) {
     try {
       const { id } = req.params;
-      let product = await productModel.findById(id);
+      mongoDBIdValidation(id);
+      const product = await productModel.findById(id);
+      if (!product) throw createError.BadRequest("لباس مورد نظر پیدا نشد");
 
       deleteLastFilePublic(product.images);
 
       const deleteProduct = await productModel.findByIdAndDelete(id);
-      if (!deleteProduct)
-        return res.status(200).json({
-          message: `لباس مورد نظر پیدا نشده`,
-        });
+      if (!deleteProduct) throw createError.Forbidden(`لباس مورد نظر حذف نشده`);
 
       return res.status(200).json({
         message: `لباس مورد نظر  با موفقیت حذف شد`,
